@@ -3,6 +3,7 @@ package auth
 import (
     "crypto/sha256"
     "encoding/csv"
+    "encoding/hex"
     "errors"
     "fmt"
     "os"
@@ -19,9 +20,10 @@ const (
     PasswordLenMax = 40
 )
 
+// generatePasswordHash accepts a password string and returns a hex encoded sha256 hash as a string
 func generatePasswordHash(password string) string {
     sum := sha256.Sum256([]byte(password))
-    return string(sum[:])
+    return hex.EncodeToString(sum[:])
 }
 
 type user struct {
