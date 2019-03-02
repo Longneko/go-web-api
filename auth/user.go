@@ -28,6 +28,9 @@ type user struct {
     username, passwordHash, FirstName, LastName string
 }
 
+// NewUser accepts username and password strings, returns pointer to a newly constructed user.
+// FirstName and LastName are set to their zero string values and should be set outside of this 
+// constructor.
 func NewUser(username, password string) (*user, error) {
     u := &user{}
     if err := u.SetUsername(username); err != nil {
