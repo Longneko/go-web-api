@@ -8,12 +8,9 @@ import (
     "fmt"
     "os"
     "unicode/utf8"
-    "../files"
 )
 
 const (
-    readAndWriteMode = 0644
-    readOnlyMode = 0444
     UsersFile = "users.csv"
     UsernameLenMin = 8
     PasswordLenMin = 8
@@ -49,7 +46,7 @@ func NewUser(username, password string) (*user, error) {
 // Returns pointer to user and error. If an error occurs, returns nill and the error.
 // Both values are returned as nil if EOF reached without errors
 func FetchUser(username string) (*user, error) {
-    file, err := os.OpenFile(UsersFile, os.O_RDONLY, files.ReadOnlyMode)
+    file, err := os.OpenFile(UsersFile, os.O_RDONLY, os.ModePerm)
     if err != nil {
         return nil, err
     }

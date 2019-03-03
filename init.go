@@ -10,7 +10,7 @@ const readAndWriteMode = 0644
 
 func main() {
     // Create session temp storage path
-    if err := os.Mkdir(auth.SessionStoragePath, readAndWriteMode); err != nil {
+    if err := os.Mkdir(auth.SessionStoragePath, os.ModePerm); err != nil {
         fmt.Printf("Error creating session storage dir: '%s'\n", err.Error())
     }
 
