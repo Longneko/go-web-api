@@ -7,6 +7,8 @@ import (
     "./auth"
 )
 
+// protected accepts users with valid sessions only. Simply tells the user their username when 
+// accessed successfully. returns 403 Forbidden status otherwise
 func protected(w http.ResponseWriter, r *http.Request) {    
     // Verify session
     sessionCookie, _ := r.Cookie(auth.SessionIdCookieName)
@@ -23,6 +25,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
     // Get user based on session
     user, _ := auth.UserFromSession(session)
     if user == nil {
+        // session is ok, but user not found, meaning internal data is probably corrupted
         http.Error(w, "Unexpected error occurred. Please try again later",
                    http.StatusInternalServerError)
         return
@@ -30,6 +33,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
 
     w.Write([]byte(fmt.Sprintf("Reached protected as: %s", user.GetUsername())))
 }
+
 
 // signup accepts parameters via POST requests and creates a new user.
 // Expected parameters:
@@ -77,6 +81,7 @@ func signup(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("User created successfully"))
 }
+
 
 func signin(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
