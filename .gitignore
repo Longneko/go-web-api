@@ -12,4 +12,4 @@
 *.out
 
 #Temporary storage directories
-temp_*
+_temp*
