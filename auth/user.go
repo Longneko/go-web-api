@@ -82,6 +82,7 @@ func (u *user) Write() error {
     if err != nil {
         return err
     }
+    defer file.Close()
     writer := csv.NewWriter(file)
     
     record := []string{u.username, u.passwordHash, u.FirstName, u.LastName}
@@ -93,7 +94,6 @@ func (u *user) Write() error {
     if err := writer.Error(); err != nil {
         return err
     }
-    file.Close()
 
     return nil
 }
@@ -143,6 +143,7 @@ func InitUsers() error {
     if err != nil {
         return err
     }
+    defer file.Close()
 
     writer := csv.NewWriter(file)
     headers := []string{"username", "passwordHash", "FirstName", "LastName"}
@@ -151,7 +152,6 @@ func InitUsers() error {
         return errors.New(errMsg)
     }
     writer.Flush()
-    file.Close()
 
     return nil
 }
