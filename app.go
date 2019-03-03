@@ -7,6 +7,10 @@ import (
     "./auth"
 )
 
+const (
+    ListenPort = ":8080"
+)
+
 // protected accepts users with valid sessions only. Simply tells the user their username when 
 // accessed successfully. returns 403 Forbidden status otherwise
 func protected(w http.ResponseWriter, r *http.Request) {    
@@ -82,7 +86,11 @@ func signup(w http.ResponseWriter, r *http.Request) {
     w.Write([]byte("User created successfully"))
 }
 
-
+// signup accepts parameters via POST requests and logs the user in by setting a session_id cookie.
+// Responds with a message of successful login or the error.
+// Expected parameters:
+// username: a string - user's username.
+// password: a string - user's password.
 func signin(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
         w.Header().Add("Allowed", http.MethodPost)
@@ -137,9 +145,10 @@ func handleRequests() {
     http.HandleFunc("/protected", protected)
     http.HandleFunc("/signin", signin)
     http.HandleFunc("/signup", signup)
-    log.Fatal(http.ListenAndServe(":8080", nil))
+    log.Fatal(http.ListenAndServe(ListenPort, nil))
 }
 
 func main() {
+    fmt.Printf("Listening on %s\n", ListenPort)
     handleRequests()
 }
