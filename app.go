@@ -74,7 +74,7 @@ func signin(w http.ResponseWriter, r *http.Request) {
 
     // Check if user exists
     username := r.PostFormValue("username")
-    user, err := auth.GetUser(username)
+    user, err := auth.FetchUser(username)
     if user == nil && err == nil {
         http.Error(w, "User not found", http.StatusForbidden)
         return

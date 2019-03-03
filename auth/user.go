@@ -71,7 +71,7 @@ func FetchUser(username string) (*user, error) {
 // Write creates a record based on user's attribute values and appends it to the UsersFile.
 // The user must have a unique username that does not exist in the UsersFile.
 func (u *user) Write() error {
-    exists, err := GetUser(u.username)
+    exists, err := FetchUser(u.username)
     if exists != nil {
         errMsg := fmt.Sprintf("User with username \"%s\" already exists", u.username)
         return errors.New(errMsg)
