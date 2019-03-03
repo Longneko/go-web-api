@@ -16,7 +16,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 // Expected parameters:
 // username: a string to be used as username.
 // password: a string to be used as password.
-// passwordConfirm: a string must match password.
+// passwordConfirm: a string, must match password.
 // firstName: [optional] a string to be used as firstName.
 // lastName: [optional] a string to be used as lastName.
 // username and password lengths are limited to min <= len <= max where min and max are set by 

@@ -8,6 +8,7 @@ import (
     "fmt"
     "os"
     "unicode/utf8"
+    "../files"
 )
 
 const (
@@ -48,7 +49,7 @@ func NewUser(username, password string) (*user, error) {
 // Returns pointer to user and error. If an error occurs, returns nill and the error.
 // Both values are returned as nil if EOF reached without errors
 func GetUser(username string) (*user, error) {
-    file, err := os.OpenFile(UsersFile, os.O_RDONLY, readOnlyMode)
+    file, err := os.OpenFile(UsersFile, os.O_RDONLY, files.ReadOnlyMode)
     if err != nil {
         return nil, err
     }
@@ -78,7 +79,7 @@ func (u *user) Write() error {
         return err
     }
 
-    file, err := os.OpenFile(UsersFile, os.O_APPEND|os.O_WRONLY, readAndWriteMode)
+    file, err := os.OpenFile(UsersFile, os.O_APPEND|os.O_WRONLY, files.ReadAndWriteMode)
     if err != nil {
         return err
     }
@@ -139,7 +140,7 @@ func (u *user) SetPassword(password string) error {
 // InitUsers creates a new .csv file (named by the UsersFile constant) if able. Sets the first
 // row values equal to the User struct attribute names in the corresponding order
 func InitUsers() error {
-    file, err := os.OpenFile(UsersFile, os.O_CREATE|os.O_EXCL, readAndWriteMode)
+    file, err := os.OpenFile(UsersFile, os.O_CREATE|os.O_EXCL, files.ReadAndWriteMode)
     if err != nil {
         return err
     }
