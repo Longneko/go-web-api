@@ -163,3 +163,7 @@ func SessionFromCookie(cookie *http.Cookie) (*session, error) {
 func (s *session) GetId() string {
     return s.id
 }
+
+// TODO add expired sessions' files cleaning functional
+// TODO add session id cookie expiration refresh on logged user activity
+

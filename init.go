@@ -13,8 +13,10 @@ func main() {
     if err := os.Mkdir(auth.SessionStoragePath, os.ModePerm); err != nil {
         fmt.Printf("Error creating session storage dir: '%s'\n", err.Error())
     }
+    fmt.Println("User storage created.")
 
     if err := auth.InitUsers(); err != nil {
         fmt.Printf("Error creating user storage file: '%s'\n", err.Error())
     }
+    fmt.Println("Session storage created.")
 }

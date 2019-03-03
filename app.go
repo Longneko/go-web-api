@@ -4,6 +4,7 @@ import (
     "fmt"
     "log"
     "net/http"
+    "os"
     "./auth"
 )
 
@@ -80,7 +81,10 @@ func signup(w http.ResponseWriter, r *http.Request) {
     user.FirstName = firstName
     user.LastName = lastName
     if err := user.Write(); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
+        fmt.Println(err) // Error that shouldn't be exposed to client is passed to console. Sould 
+                         // eventually be replaced with propper logging
+        http.Error(w, "Unexpected error occurred. Please try again later",
+                   http.StatusInternalServerError)
         return
     }
 
@@ -173,6 +177,16 @@ func handleRequests() {
 }
 
 func main() {
+    checklist := []string{auth.UsersFile, auth.SessionStoragePath}
+    // Exists reports whether the named file or directory exists.
+    for _, pathname := range(checklist) {
+        if _, err := os.Stat(pathname); err != nil {
+            if os.IsNotExist(err) {
+                log.Fatal("Storage assests missing. Please run 'go run init.go' and try again")
+            }
+        }
+    }
+
     fmt.Printf("Listening on %s\n", ListenPort)
     handleRequests()
 }
