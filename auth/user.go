@@ -45,10 +45,10 @@ func NewUser(username, password string) (*user, error) {
     return u, nil
 }
 
-// GetUser accepts a username string and searches through the UsersFile for the correspoinding user.
+// FetchUser accepts a username string and searches through the UsersFile for the correspoinding user.
 // Returns pointer to user and error. If an error occurs, returns nill and the error.
 // Both values are returned as nil if EOF reached without errors
-func GetUser(username string) (*user, error) {
+func FetchUser(username string) (*user, error) {
     file, err := os.OpenFile(UsersFile, os.O_RDONLY, files.ReadOnlyMode)
     if err != nil {
         return nil, err
