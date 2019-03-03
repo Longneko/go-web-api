@@ -13,7 +13,7 @@ const (
 )
 
 // protected accepts users with valid sessions only. Simply tells the user their username when 
-// accessed successfully. returns 403 Forbidden status otherwise
+// accessed successfully. Returns 403 Forbidden status otherwise
 func protected(w http.ResponseWriter, r *http.Request) {    
     // Verify session
     sessionCookie, _ := r.Cookie(auth.SessionIdCookieName)
@@ -48,7 +48,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
 // passwordConfirm: a string, must match password.
 // firstName: [optional] a string to be used as firstName.
 // lastName: [optional] a string to be used as lastName.
-// username and password lengths are limited to min <= len <= max where min and max are set by 
+// username and password lengths are limited to min <= len <= max where min and max are set by the
 // UsernameLenMin, UsernameLenMax, PasswordLenMin, PasswordLenMax constants in auth package
 func signup(w http.ResponseWriter, r *http.Request) {
     if r.Method != http.MethodPost {
