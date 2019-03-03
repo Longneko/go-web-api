@@ -152,7 +152,7 @@ func logout(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Session invalid or already terminated", http.StatusForbidden)
         return
     }
-    if err := session.Terminate(); err != nil {
+    if err := session.Terminate(w); err != nil {
         fmt.Println(err) // Error that shouldn't be exposed to client is passed to console. Sould 
                          // eventually be replaced with propper logging
         http.Error(w, "Unexpected error occurred. Please try again later",
