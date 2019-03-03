@@ -10,6 +10,7 @@ import (
 const (
     IdByteLen = 16
     SessionStoragePath = "./_temp_sessions"
+    SessionIdCookieName = "session_id"
 )
 
 type session struct{
@@ -53,7 +54,7 @@ func SessionFromFile(id string) (*session, error) {
 // as it is used for the file name)
 func (s *session) Write() error {
     filepath := SessionStoragePath + "/" + s.id
-    file, err := os.OpenFile(filepath, os.O_CREATE|os.O_EXCL, files.ReadAndWriteMode)
+    file, err := os.OpenFile(filepath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, files.ReadAndWriteMode)
     if err != nil {
         return err
     }
