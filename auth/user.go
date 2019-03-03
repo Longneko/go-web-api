@@ -5,6 +5,7 @@ import (
     "encoding/csv"
     "encoding/hex"
     "fmt"
+    "net/http"
     "os"
     "unicode/utf8"
 )
@@ -64,10 +65,10 @@ func FetchUser(username string) (*user, error) {
     return nil, nil
 }
 
-// FetchUser is a wrapper function for FetchUser and accepts session pointer instead of a username
-// string
+// FetchUser is a convenience function for FetchUser and accepts session pointer instead of a 
+// username string
 func UserFromSession(s *session) (*user, error) {
-    return FetchUser(s.username)
+    return FetchUser(s.user.username)
 }
 
 // Write creates a record based on user's attribute values and appends it to the UsersFile.
@@ -134,6 +135,11 @@ func (u *user) SetPassword(password string) error {
     u.passwordHash = generatePasswordHash(password)
 
     return nil
+}
+
+// InitSession is a convenience method for the session's InitSession
+func (u *user) InitSession(w http.ResponseWriter) (*session, error) {
+    return InitSession(u, w)
 }
 
 

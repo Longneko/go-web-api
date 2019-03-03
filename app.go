@@ -17,7 +17,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
     // Verify session
     sessionCookie, _ := r.Cookie(auth.SessionIdCookieName)
     if sessionCookie == nil {
-        http.Error(w, "Session invalid or expired", http.StatusForbidden)
+        http.Error(w, "Session missing", http.StatusForbidden)
         return
     }
     session, _ := auth.SessionFromCookie(sessionCookie)
@@ -35,6 +35,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    w.WriteHeader(http.StatusOK)
     w.Write([]byte(fmt.Sprintf("Reached protected as: %s", user.GetUsername())))
 }
 
@@ -82,6 +83,7 @@ func signup(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
+
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("User created successfully"))
 }
@@ -123,28 +125,50 @@ func signin(w http.ResponseWriter, r *http.Request) {
     }
     
     // Create session and set cookie
-    session, err := auth.NewSession(user)
-    if err != nil || session == nil {
+    _, err = auth.InitSession(user, w)
+    if err != nil {
+        fmt.Println(err) // Error that shouldn't be exposed to client is passed to console. Sould 
+                         // eventually be replaced with propper logging
         http.Error(w, "Unexpected error occurred. Please try again later",
                    http.StatusInternalServerError)
         return
     }
-    if err := session.Write(); err != nil {
-        http.Error(w, "Unexpected error occurred. Please try again later",
-                   http.StatusInternalServerError)
-        return
-    }
-    sessionCookie := session.CreateCookie()
-    http.SetCookie(w, sessionCookie)
-
+    
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Login successful"))
+}
+
+// logout logs the user out by setting the session_id cookie to expire and its value to 'deleted'. 
+// Active session is also removed from server storage
+func logout(w http.ResponseWriter, r *http.Request) {
+    // Verify session
+    sessionCookie, _ := r.Cookie(auth.SessionIdCookieName)
+    if sessionCookie == nil {
+        http.Error(w, "Session missing or already terminated", http.StatusForbidden)
+        return
+    }
+    session, _ := auth.SessionFromCookie(sessionCookie)
+    if session == nil {
+        http.Error(w, "Session invalid or already terminated", http.StatusForbidden)
+        return
+    }
+    if err := session.Terminate(); err != nil {
+        fmt.Println(err) // Error that shouldn't be exposed to client is passed to console. Sould 
+                         // eventually be replaced with propper logging
+        http.Error(w, "Unexpected error occurred. Please try again later",
+                   http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Logout successful"))
 }
 
 func handleRequests() {
     http.HandleFunc("/protected", protected)
     http.HandleFunc("/signin", signin)
     http.HandleFunc("/signup", signup)
+    http.HandleFunc("/logout", logout)
     log.Fatal(http.ListenAndServe(ListenPort, nil))
 }
 
