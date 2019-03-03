@@ -7,9 +7,28 @@ import (
     "./auth"
 )
 
-func index(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Reached Index")
-    // TODO
+func protected(w http.ResponseWriter, r *http.Request) {    
+    // Verify session
+    sessionCookie, _ := r.Cookie(auth.SessionIdCookieName)
+    if sessionCookie == nil {
+        http.Error(w, "Session invalid or expired", http.StatusForbidden)
+        return
+    }
+    session, _ := auth.SessionFromCookie(sessionCookie)
+    if session == nil {
+        http.Error(w, "Session invalid or expired", http.StatusForbidden)
+        return
+    }
+
+    // Get user based on session
+    user, _ := auth.UserFromSession(session)
+    if user == nil {
+        http.Error(w, "Unexpected error occurred. Please try again later",
+                   http.StatusInternalServerError)
+        return
+    }
+
+    w.Write([]byte(fmt.Sprintf("Reached protected as: %s", user.GetUsername())))
 }
 
 // signup accepts parameters via POST requests and creates a new user.
@@ -89,13 +108,28 @@ func signin(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Invalid password", http.StatusForbidden)
         return
     }
-    // TODO: add login logic
+    
+    // Create session and set cookie
+    session, err := auth.NewSession(user)
+    if err != nil || session == nil {
+        http.Error(w, "Unexpected error occurred. Please try again later",
+                   http.StatusInternalServerError)
+        return
+    }
+    if err := session.Write(); err != nil {
+        http.Error(w, "Unexpected error occurred. Please try again later",
+                   http.StatusInternalServerError)
+        return
+    }
+    sessionCookie := session.CreateCookie()
+    http.SetCookie(w, sessionCookie)
 
-    fmt.Fprintf(w, "%v\n", user.GetUsername())
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Login successful"))
 }
 
 func handleRequests() {
-    http.HandleFunc("/index", index)
+    http.HandleFunc("/protected", protected)
     http.HandleFunc("/signin", signin)
     http.HandleFunc("/signup", signup)
     log.Fatal(http.ListenAndServe(":8080", nil))

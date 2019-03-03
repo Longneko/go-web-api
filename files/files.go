@@ -5,11 +5,6 @@ import (
     "os"
 )
 
-const (
-    ReadAndWriteMode = 0644
-    ReadOnlyMode = 0444
-)
-
 // ScanFileByLines accepts a filepath string and returns a slice of strings, each representing a
 // line read from the file. Errors encountered during reading will result in returning both the 
 // error and lines read so far

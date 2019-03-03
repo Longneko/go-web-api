@@ -4,7 +4,6 @@ import (
     "crypto/sha256"
     "encoding/csv"
     "encoding/hex"
-    "errors"
     "fmt"
     "os"
     "unicode/utf8"
@@ -43,7 +42,7 @@ func NewUser(username, password string) (*user, error) {
 }
 
 // FetchUser accepts a username string and searches through the UsersFile for the correspoinding user.
-// Returns pointer to user and error. If an error occurs, returns nill and the error.
+// Returns pointer to user and error. If an error occurs, returns nil and the error.
 // Both values are returned as nil if EOF reached without errors
 func FetchUser(username string) (*user, error) {
     file, err := os.OpenFile(UsersFile, os.O_RDONLY, os.ModePerm)
@@ -65,13 +64,18 @@ func FetchUser(username string) (*user, error) {
     return nil, nil
 }
 
+// FetchUser is a wrapper function for FetchUser and accepts session pointer instead of a username
+// string
+func UserFromSession(s *session) (*user, error) {
+    return FetchUser(s.username)
+}
+
 // Write creates a record based on user's attribute values and appends it to the UsersFile.
 // The user must have a unique username that does not exist in the UsersFile.
 func (u *user) Write() error {
     exists, err := FetchUser(u.username)
     if exists != nil {
-        errMsg := fmt.Sprintf("User with username \"%s\" already exists", u.username)
-        return errors.New(errMsg)
+        return fmt.Errorf("User with username \"%s\" already exists", u.username)
     } else if err != nil {
         return err
     }
@@ -100,9 +104,8 @@ func (u *user) Write() error {
 func (u *user) SetUsername(username string) error {
     length := utf8.RuneCountInString(username)
     if length < UsernameLenMin || length > UsernameLenMax {
-        errMsg := fmt.Sprintf("Username must be len characters long, where %d<=len<=%d",
-                              UsernameLenMin, UsernameLenMax)
-        return errors.New(errMsg)
+        return fmt.Errorf("Username must be len characters long, where %d<=len<=%d",
+                          UsernameLenMin, UsernameLenMax)
     }
     u.username = username
 
@@ -124,9 +127,9 @@ func (u *user) CheckPassword(password string) bool {
 func (u *user) SetPassword(password string) error {
     length := utf8.RuneCountInString(password)
     if length < PasswordLenMin || length > PasswordLenMax {
-        errMsg := fmt.Sprintf("Password must be len characters long, where %d<=len<=%d",
-                              PasswordLenMin, PasswordLenMax)
-        return errors.New(errMsg)
+        err := fmt.Errorf("Password must be len characters long, where %d<=len<=%d",
+                          PasswordLenMin, PasswordLenMax)
+        return err
     }
     u.passwordHash = generatePasswordHash(password)
 
@@ -146,8 +149,7 @@ func InitUsers() error {
     writer := csv.NewWriter(file)
     headers := []string{"username", "passwordHash", "FirstName", "LastName"}
     if err := writer.Write(headers); err != nil {
-        errMsg := fmt.Sprintf("error writing record to csv: %s", err)
-        return errors.New(errMsg)
+        return fmt.Errorf("error setting user csv headers: %s", err)
     }
     writer.Flush()
 

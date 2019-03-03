@@ -3,6 +3,7 @@ package auth
 import (
     "crypto/rand"
     "encoding/hex"
+    "fmt"
     "net/http"
     "os"
     "../files"
@@ -39,9 +40,9 @@ func NewSession(u *user) (*session, error) {
     return &session{id, u.GetUsername()}, nil
 }
 
-// SessionFromFile accepts an id string and returns a session of said id pointer constructed from 
+// sessionFromFile accepts an id string and returns a session of said id pointer constructed from 
 // the file. See *session.Write() for file related details
-func SessionFromFile(id string) (*session, error) {
+func sessionFromFile(id string) (*session, error) {
     filepath := SessionStoragePath + "/" + id
     lines, err := files.ScanFileByLines(filepath)
     if err != nil {
@@ -86,6 +87,17 @@ func (s *session) CreateCookie() *http.Cookie {
     }
 
     return &sessionCookie
+}
+
+// SessionFromCookie accepts a cookie with session id and returns constructed session if found.
+// Cookie name must match SessionIdCookieName constant
+func SessionFromCookie(cookie *http.Cookie) (*session, error) {
+    if cookie.Name != SessionIdCookieName {
+        err := fmt.Errorf("Invalid cookie name '%s'. Must be %s", cookie.Name, SessionIdCookieName)
+        return nil, err
+    }
+    sessionId := cookie.Value
+    return sessionFromFile(sessionId)
 }
 
 func (s *session) GetId() string {
