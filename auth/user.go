@@ -79,7 +79,7 @@ func (u *user) Write() error {
         return err
     }
 
-    file, err := os.OpenFile(UsersFile, os.O_APPEND|os.O_WRONLY, files.ReadAndWriteMode)
+    file, err := os.OpenFile(UsersFile, os.O_APPEND|os.O_WRONLY, os.ModePerm)
     if err != nil {
         return err
     }
@@ -140,7 +140,7 @@ func (u *user) SetPassword(password string) error {
 // InitUsers creates a new .csv file (named by the UsersFile constant) if able. Sets the first
 // row values equal to the User struct attribute names in the corresponding order
 func InitUsers() error {
-    file, err := os.OpenFile(UsersFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, files.ReadAndWriteMode)
+    file, err := os.OpenFile(UsersFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.ModePerm)
     if err != nil {
         return err
     }

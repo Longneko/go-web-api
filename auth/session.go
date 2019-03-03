@@ -3,6 +3,7 @@ package auth
 import (
     "crypto/rand"
     "encoding/hex"
+    "net/http"
     "os"
     "../files"
 )
@@ -11,6 +12,7 @@ const (
     IdByteLen = 16
     SessionStoragePath = "./_temp_sessions"
     SessionIdCookieName = "session_id"
+    SessionIdCookieMaxAge = 86400
 )
 
 type session struct{
@@ -54,7 +56,7 @@ func SessionFromFile(id string) (*session, error) {
 // as it is used for the file name)
 func (s *session) Write() error {
     filepath := SessionStoragePath + "/" + s.id
-    file, err := os.OpenFile(filepath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, files.ReadAndWriteMode)
+    file, err := os.OpenFile(filepath, os.O_CREATE|os.O_EXCL|os.O_WRONLY, os.ModePerm)
     if err != nil {
         return err
     }
@@ -65,6 +67,25 @@ func (s *session) Write() error {
     }
 
     return nil
+}
+
+// CreateCookie returns a http.Cookie pointer for tracking user session.
+// Cookie's name and max age are set by the SessionIdCookieName and SessionIdCookieMaxAge constants
+// respectively
+func (s *session) CreateCookie() *http.Cookie {
+    id := s.GetId()
+    raw := SessionIdCookieName + "=" + id
+    sessionCookie := http.Cookie{
+        Name    : SessionIdCookieName,
+        Value   : id,
+        MaxAge  : SessionIdCookieMaxAge,
+        Secure  : true,
+        HttpOnly: true,
+        Raw     : raw,
+        Unparsed: []string{raw},
+    }
+
+    return &sessionCookie
 }
 
 func (s *session) GetId() string {
