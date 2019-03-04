@@ -7,11 +7,13 @@ import (
     "fmt"
     "net/http"
     "os"
+    "regexp"
     "unicode/utf8"
 )
 
 const (
     UsersFile = "users.csv"
+    UsernameAllowedRunes = "a-zA-Z0-9_"
     UsernameLenMin = 8
     PasswordLenMin = 8
     UsernameLenMax = 40
@@ -107,6 +109,10 @@ func (u *user) SetUsername(username string) error {
     if length < UsernameLenMin || length > UsernameLenMax {
         return fmt.Errorf("Username must be len characters long, where %d<=len<=%d",
                           UsernameLenMin, UsernameLenMax)
+    }
+    pattern := "[^" + UsernameAllowedRunes + "]"
+    if matched, _ := regexp.MatchString(pattern, username); matched {
+        return fmt.Errorf("Username can only contain charaters '%s'", UsernameAllowedRunes)
     }
     u.username = username
 

@@ -43,7 +43,7 @@ func protected(w http.ResponseWriter, r *http.Request) {
 
 // signup accepts parameters via POST requests and creates a new user.
 // Expected parameters:
-// username: a string to be used as username.
+// username: a string to be used as username. Limited to characters from auth.UsernameAllowedRunes
 // password: a string to be used as password.
 // passwordConfirm: a string, must match password.
 // firstName: [optional] a string to be used as firstName.

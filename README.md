@@ -23,7 +23,7 @@ Currently, the server only runs on 8080 port.
 ### /signup [POST only]
 Registers new user
 **Expected parameters:**
-* _username_: a string to be used as username.
+* _username_: a string to be used as username. Can only contain alphanumeric charaters (a-zA-Z) and underscore (_)
 * _password_: a string to be used as password.
 * _passwordConfirm_: a string, must match password.
 * _firstName_: [optional] a string to be used as firstName.
